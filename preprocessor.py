@@ -53,6 +53,7 @@ def target_encoding(df, col_name, outcome, new_col_name):
     df.drop(columns=[col_name], inplace=True)
 
 def primary_processor(df):
+    df.drop(['wave'], axis = 1, inplace= True)
     df = df.map(strip_byte)
     blank_cells(df)
     lowercase(df)
@@ -63,15 +64,9 @@ def primary_processor(df):
     df_encoded = one_hot_encoding(df, target_cols)
     return df_encoded
 
-
-# main function
-def main():
-    excel_to_csv("speed_dating.xlsx", "backup.csv")
-    df = pd.read_csv("backup.csv")
-
-    df_encoded = primary_processor(df)
-    df1_te = df_encoded.copy()
-    df2_group = df_encoded.copy()
+def field_processing(df):
+    df1_te = df.copy()
+    df2_group = df.copy()
 
     # target encoding for categorical variables with large set of data
     target_encoding(df1_te, 'field', 'match', 'field_target')
@@ -80,8 +75,36 @@ def main():
     df2_group['field'] = df2_group['field'].map(fm.field_mapping).fillna('other')
     df2_group = one_hot_encoding(df2_group, ['field'])
 
-    df1_te.to_csv("speeddating_target_encoded.csv", index=False)
-    df2_group.to_csv("speeddating_grouped.csv", index=False)
+    return df1_te, df2_group
+
+# data imputation method
+def impute_data(df):
+    df2 = df.copy()
+    nan_cols = []
+    for col in df2.columns:
+        if df2[col].isna().any():
+            nan_cols.append(col)
+    for col in nan_cols:
+        median = df2[col].median()
+        df2[col] = df2[col].fillna(median)
+    return df2
+
+# main function
+def main():
+    excel_to_csv("speed_dating.xlsx", "backup.csv")
+    df = pd.read_csv("backup.csv")
+
+    df_encoded = primary_processor(df)
+    df1_te, df2_group = field_processing(df_encoded)
+
+    df1_te_imputed = impute_data(df1_te)
+    df2_group_imputed = impute_data(df2_group)
+
+    df1_te.to_csv("speeddating_target_encoded_NaN.csv", index=False)
+    df2_group.to_csv("speeddating_grouped_NaN.csv", index=False)
+    
+    df1_te_imputed.to_csv("speeddating_target_encoded_imputed.csv", index=False)
+    df2_group_imputed.to_csv("speeddating_grouped_imputed.csv", index=False)
 
 if __name__=="__main__":
     main()
