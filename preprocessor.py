@@ -53,5 +53,6 @@ def main():
         print("New 'speeddating.csv' created and saved.")
     else:
         print("already exists")
+
 if __name__=="__main__":
     main()
