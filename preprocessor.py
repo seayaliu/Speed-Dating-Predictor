@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
+import field_mapping as fm
 
 # strip "b''" byte wrappings from data set items
 def strip_byte(item):
@@ -23,9 +24,17 @@ def find_non_numerical(data):
     str_cols = data.select_dtypes(include=['object']).columns.tolist()
     return str_cols
 
+# replace blank cells and cells with "?" with NaN
 def blank_cells(df):
     df.replace("?", np.nan, inplace=True)
     df.replace("", np.nan, inplace=True)
+
+# convert strings to lowercase
+def lowercase(df):
+    for col in df.columns:
+        if df[col].dtype == 'object':
+            df[col] = df[col].str.lower()
+    return df
 
 # one hot encoding 
 # reference code: https://www.geeksforgeeks.org/ml-one-hot-encoding/
@@ -37,22 +46,42 @@ def one_hot_encoding(data, columns):
     df_encoded = df_encoded.drop(columns, axis=1)
     return df_encoded
 
+# target encoding for variables with large set of categorical data
+def target_encoding(df, col_name, outcome, new_col_name):
+    field_means = df.groupby(col_name)[outcome].mean()
+    df[new_col_name] = df[col_name].map(field_means)
+    df.drop(columns=[col_name], inplace=True)
+
+def primary_processor(df):
+    df = df.map(strip_byte)
+    blank_cells(df)
+    lowercase(df)
+
+    # intial categorical variable processing
+    target_cols = find_non_numerical(df)
+    target_cols.remove('field')
+    df_encoded = one_hot_encoding(df, target_cols)
+    return df_encoded
+
+
 # main function
 def main():
     excel_to_csv("speed_dating.xlsx", "backup.csv")
     df = pd.read_csv("backup.csv")
-    df = df.map(strip_byte)
-    blank_cells(df)
-    target_cols = find_non_numerical(df)
-    target_cols.remove('field')
-    df_encoded = one_hot_encoding(df, target_cols)
-    print(df_encoded.columns.tolist())
 
-    if not os.path.exists("speeddating.csv"):
-        df_encoded.to_csv("speeddating.csv", index=False)
-        print("New 'speeddating.csv' created and saved.")
-    else:
-        print("already exists")
+    df_encoded = primary_processor(df)
+    df1_te = df_encoded.copy()
+    df2_group = df_encoded.copy()
+
+    # target encoding for categorical variables with large set of data
+    target_encoding(df1_te, 'field', 'match', 'field_target')
+
+    # encoding field with groups
+    df2_group['field'] = df2_group['field'].map(fm.field_mapping).fillna('other')
+    df2_group = one_hot_encoding(df2_group, ['field'])
+
+    df1_te.to_csv("speeddating_target_encoded.csv", index=False)
+    df2_group.to_csv("speeddating_grouped.csv", index=False)
 
 if __name__=="__main__":
     main()
