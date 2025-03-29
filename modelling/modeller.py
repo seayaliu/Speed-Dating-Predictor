@@ -79,7 +79,7 @@ def main():
     df_names = ["SDImp_FGroups", "SDImp_FTEncodings", "SDNaN_FTGroups", "SDNaN_FTEncodings"]
 
     for idx, df in enumerate(dfs):
-        # distribution(df_tei)
+        distribution(df_tei)
         binoms = std.binomial_set(df)
         X = std.normal_scale(df, binoms)
 
