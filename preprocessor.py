@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
-import analysis as fm
+import field_mapping as fm
 
 # strip "b''" byte wrappings from data set items
 def strip_byte(item):
