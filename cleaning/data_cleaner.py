@@ -91,8 +91,8 @@ def impute_data(df):
 
 # main function
 def main():
-    excel_to_csv("speed_dating.xlsx", "backup.csv")
-    df = pd.read_csv("backup.csv")
+    excel_to_csv("../data/original/speed_dating.xlsx", "../data/original/backup.csv")
+    df = pd.read_csv("../data/original/backup.csv")
 
     df_encoded = primary_processor(df)
     df1_te, df2_group = field_processing(df_encoded)
@@ -100,11 +100,11 @@ def main():
     df1_te_imputed = impute_data(df1_te)
     df2_group_imputed = impute_data(df2_group)
 
-    df1_te.to_csv("speeddating_target_encoded_NaN.csv", index=False)
-    df2_group.to_csv("speeddating_grouped_NaN.csv", index=False)
+    df1_te.to_csv("../data/cleaned/speeddating_target_encoded_NaN.csv", index=False)
+    df2_group.to_csv("../data/cleaned/speeddating_grouped_NaN.csv", index=False)
     
-    df1_te_imputed.to_csv("speeddating_target_encoded_imputed.csv", index=False)
-    df2_group_imputed.to_csv("speeddating_grouped_imputed.csv", index=False)
+    df1_te_imputed.to_csv("../data/cleaned/speeddating_target_encoded_imputed.csv", index=False)
+    df2_group_imputed.to_csv("../data/cleaned/speeddating_grouped_imputed.csv", index=False)
 
 if __name__=="__main__":
     main()

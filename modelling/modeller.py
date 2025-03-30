@@ -1,10 +1,11 @@
 import pca
 import pls
+import standardizing as std
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
-import standardizer as std
 import seaborn as sns
+import stat_sig as sig
 # import prince
 
 def distribution(df):
@@ -65,49 +66,58 @@ def plot_scores(t, method, data_name):
     plt.show()
 
 def main():
-    sdg_imputed = "speeddating_grouped_imputed.csv"
-    sdte_imputed = "speeddating_target_encoded_imputed.csv"
-    sdg_NaN = "speeddating_grouped_NaN.csv"
-    sdte_NaN = "speeddating_target_encoded_NaN.csv"
+    sdg_imputed = "../data/cleaned/speeddating_grouped_imputed.csv"
+    sdte_imputed = "../data/cleaned/speeddating_target_encoded_imputed.csv"
+    sdg_NaN = "../data/cleaned/speeddating_grouped_NaN.csv"
+    sdte_NaN = "../data/cleaned/speeddating_target_encoded_NaN.csv"
 
     df_gi = pd.read_csv(sdg_imputed)
     df_tei = pd.read_csv(sdte_imputed)
     df_gn = pd.read_csv(sdg_NaN)
     df_ten = pd.read_csv(sdte_NaN)
 
-    dfs = [df_gi, df_tei, df_gn, df_ten]
-    df_names = ["SDImp_FGroups", "SDImp_FTEncodings", "SDNaN_FTGroups", "SDNaN_FTEncodings"]
+    dfs = [df_gi, df_tei]
+    df_names = ["SDImp_FGroups", "SDImp_FTEncodings"]
+    # dfs = [df_gi, df_tei, df_gn, df_ten]
+    # df_names = ["SDImp_FGroups", "SDImp_FTEncodings", "SDNaN_FTGroups", "SDNaN_FTEncodings"]
 
     for idx, df in enumerate(dfs):
-        distribution(df_tei)
+        distribution(df)
         binoms = std.binomial_set(df)
         X = std.normal_scale(df, binoms)
-
-        # pca
-        t1, p1, r21 = pca.nipalspca(X.values, 3)
-        if idx < 2:
-            X_dot = std.evd_dot(X)
-            t2, p2, r22 = pca.evd_pca(X_dot, 3)
-
-        # pls
-        if idx < 2:
-            Xpls = df.iloc[:, list(range(0, 58)) + list(range(59, df.shape[1]))].to_numpy()
-            Ypls = df.iloc[:, [5]].to_numpy()
-            t, u, w_star, c, p, r2 = pls.nipalspls(Xpls, Ypls, 3)
 
         variable_names = X.columns 
         variable_names2 = list(variable_names)
         variable_names2.remove("decision")
+        variable_names2.remove("decision_o")
+        variable_names2.remove("match")
 
+        # nipals pca
+        t1, p1, r21 = pca.nipalspca(X.values, 3)
+        n1, A1 = X.shape
         plot_loadings(variable_names, p1, "NIPALS PCA", df_names[idx])
         plot_scores(t1, "NIPALS PCA", df_names[idx])
+        # sig.spe(df, n1, t1, p1, X) # spe
 
-        plot_loadings(variable_names, p1, "EVD PCA", df_names[idx])
-        plot_scores(t1, "EVD PCA", df_names[idx])
-        
-        plot_loadings(variable_names2, w_star, "NIPALS PLS", df_names[idx])
-        plot_scores(t, "NIPALS PLS", df_names[idx])
+        # evd pca
+        if idx < 2:
+            t2, p2, r22 = pca.evd_pca(X, 3)
+            t2_np = t2.to_numpy()
+            plot_loadings(variable_names, p2, "EVD PCA", df_names[idx])
+            plot_scores(t2_np, "EVD PCA", df_names[idx])
+            # sig.spe(df, n1, t2_np, p2, X)
 
+        # pls
+            Xpls = df.iloc[:, list(range(0, 58)) + list(range(61, df.shape[1]))].to_numpy()
+            binoms = std.binomial_set(df)
+            Xpls = std.normal_scale(Xpls, binoms)
+            Ypls = df.iloc[:, [58]].to_numpy()
+            t, u, w_star, c, p, r2 = pls.nipalspls(Xpls, Ypls, 3)
+
+            n_pls, A2 = X.shape            
+            plot_loadings(variable_names2, p, "NIPALS PLS", df_names[idx])
+            plot_scores(t, "NIPALS PLS", df_names[idx])
+            # sig.spe(df, n_pls, t, p, Xpls)
 
 if __name__=="__main__":
     main()

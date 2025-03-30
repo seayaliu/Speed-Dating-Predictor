@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
+import standardizing as std
 
 def nipalspca(x, A):
     x = x.copy()
@@ -48,8 +49,12 @@ def nipalspca(x, A):
 
 def evd_pca(X, A):
     X = X.copy()
+    X_dot = std.evd_dot(X)
     
-    eig_vals, eig_vecs = np.linalg.eig(X)
+    eig_vals, eig_vecs = np.linalg.eig(X_dot)
+
+    eig_vals = np.real(eig_vals)
+    eig_vecs = np.real(eig_vecs)
     
     # Sorting eigenvalues and eigenvectors in descending order
     sorted_indices = np.argsort(eig_vals)[::-1]
