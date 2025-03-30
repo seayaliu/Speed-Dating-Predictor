@@ -97,7 +97,8 @@ def main():
         n1, A1 = X.shape
         plot_loadings(variable_names, p1, "NIPALS PCA", df_names[idx])
         plot_scores(t1, "NIPALS PCA", df_names[idx])
-        # sig.spe(df, n1, t1, p1, X) # spe
+        sig.spe(df, n1, t1, p1, X) # spe
+        sig.hotellings_t2(t1)
 
         # evd pca
         if idx < 2:
@@ -105,7 +106,8 @@ def main():
             t2_np = t2.to_numpy()
             plot_loadings(variable_names, p2, "EVD PCA", df_names[idx])
             plot_scores(t2_np, "EVD PCA", df_names[idx])
-            # sig.spe(df, n1, t2_np, p2, X)
+            sig.spe(df, n1, t2_np, p2, X) # spe
+            sig.hotellings_t2(t2_np)
 
         # pls
             Xpls = df.iloc[:, list(range(0, 58)) + list(range(61, df.shape[1]))].to_numpy()
@@ -117,7 +119,19 @@ def main():
             n_pls, A2 = X.shape            
             plot_loadings(variable_names2, p, "NIPALS PLS", df_names[idx])
             plot_scores(t, "NIPALS PLS", df_names[idx])
-            # sig.spe(df, n_pls, t, p, Xpls)
+            sig.spe(df, n_pls, t, p, Xpls)
+            sig.hotellings_t2(t)
+
+        # heatmap
+        # plt.subplots(figsize=(20,15))
+        # ax = plt.axes()
+        # ax.set_title("Correlation Heatmap")
+        # corr = df.corr()
+        # sns.heatmap(corr,
+        #             xticklabels=corr.columns.values,
+        #             yticklabels=corr.columns.values)
+        # plt.xticks(fontsize=5)
+        # plt.yticks(fontsize=5)
 
 if __name__=="__main__":
     main()
