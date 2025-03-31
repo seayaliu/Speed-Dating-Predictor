@@ -39,6 +39,7 @@ def plot_loadings(variable_names, p, method, data_name):
     plt.xlabel("Variables", fontsize=12)
     plt.xticks(rotation=90, fontsize=5)
     plt.grid(axis='y', linestyle='--', linewidth=0.5)
+    plt.tight_layout()
     plt.show()
 
     #PLOTTING FOR LOADINGS FOR PC2
@@ -49,6 +50,7 @@ def plot_loadings(variable_names, p, method, data_name):
     plt.xlabel("Variables",fontsize=12)
     plt.xticks(rotation=90, fontsize=5)
     plt.grid(axis='y', linestyle='--', linewidth=0.5)
+    plt.tight_layout()
     plt.show()
 
 def plot_scores(t, method, data_name):

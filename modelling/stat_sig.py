@@ -14,7 +14,7 @@ def spe(df, n, t, p, X):
     spe_95 = (var/(2*mean)) * chi2.ppf(0.95, doff)
     spe_99 = (var/(2*mean)) * chi2.ppf(0.99, doff)
 
-    plt.plot(range(1, n + 1), SPE, marker='.', linestyle='-', label="SPE")
+    plt.plot(range(1, n + 1), SPE, linewidth=0.5, marker='.', linestyle='-', label="SPE")
     plt.axhline(y=spe_95, color='r', linestyle='--', label="95% Confidence Interval")
     plt.axhline(y=spe_99, color='b', linestyle='-.', label="99% Confidence Interval")
     plt.xlabel("Observation Number")
@@ -43,7 +43,7 @@ def hotellings_t2(t):
     T2 = np.sum((t / np.std(t, axis=0, ddof=1))**2, axis=1)
 
     # plotting line plot
-    plt.plot(range(1, n + 1), T2, marker='.', linestyle='-', label="Hotelling's T2")
+    plt.plot(range(1, n + 1), T2, linewidth=0.5, marker='.', linestyle='-', label="Hotelling's T2")
     plt.axhline(y=F_95, color='r', linestyle='--', label="95% Confidence Interval")
     plt.axhline(y=F_99, color='b', linestyle='-.', label="99% Confidence Interval")
     plt.xlabel("Observation Number")

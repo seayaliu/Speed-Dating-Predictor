@@ -7,7 +7,10 @@ import pandas as pd
 def create_distribution_plot(data, xlabel, axes, x, y):
     sns.histplot(data, bins=30, ax=axes[x, y], color='blue')
     axes[x, y].set_xlabel(xlabel, fontsize=3)
-    axes[x, y].set_ylabel("Frequency", fontsize=3)
+    if y==0:
+        axes[x, y].set_ylabel("Frequency", fontsize=3)
+    else:
+        axes[x, y].set_ylabel("", fontsize=3)
     axes[x, y].tick_params(axis='both', labelsize=3)
 
 def binomial_set(df):
