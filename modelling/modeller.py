@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
 import seaborn as sns
 import stat_sig as sig
+import scree
 # import prince
 
 def distribution(df):
@@ -30,6 +31,7 @@ def distribution(df):
 def plot_loadings(variable_names, p, method, data_name):
     pc1_loadings = p[:, 0]  #loadings for PC1
     pc2_loadings = p[:, 1]  #loadings for PC2
+    pclast_loadings = p[:, -1]
 
     #PLOTTING FOR LOADINGS FOR PC1
     title1 = "PC1 Loadings - " + method + " " + data_name
@@ -53,6 +55,18 @@ def plot_loadings(variable_names, p, method, data_name):
     plt.tight_layout()
     plt.show()
 
+    #PLOTTING FOR LOADINGS FOR PC20
+    title2 = "Last PC Loadings - " + method + " " + data_name
+    plt.bar(variable_names, pclast_loadings, color='blue', alpha=0.8)
+    plt.title(title2, fontsize=12)
+    plt.ylabel("Magnitude of Loadings", fontsize=12)
+    plt.xlabel("Variables",fontsize=12)
+    plt.xticks(rotation=90, fontsize=5)
+    plt.grid(axis='y', linestyle='--', linewidth=0.5)
+    plt.tight_layout()
+    plt.show()
+
+
 def plot_scores(t, method, data_name):
     pc1_scores = t[:, 0]
     pc2_scores = t[:, 1]
@@ -67,73 +81,94 @@ def plot_scores(t, method, data_name):
     plt.grid(axis='y', linestyle='--', linewidth=0.5)
     plt.show()
 
+def run_nipalspca(df, df_name, A):
+    binoms = std.binomial_set(df)
+    X = std.normal_scale(df, binoms)
+
+    # nipals pca
+    variable_names = X.columns 
+    t1, p1, r21 = pca.nipalspca(X.values, A)
+    n1, A = X.shape
+    plot_loadings(variable_names, p1, "NIPALS PCA", df_name)
+    plot_scores(t1, "NIPALS PCA", df_name)
+    # sig.spe(df, n1, t1, p1, X)
+    # sig.hotellings_t2(t1)
+
+def run_nipalspls(df, df_name, A):
+    binoms = std.binomial_set(df)
+    X = std.normal_scale(df, binoms)
+
+    variable_names = list(X.columns)
+    variable_names.remove("decision")
+    variable_names.remove("decision_o")
+    variable_names.remove("match")
+
+    # pls
+    Ypls = X.iloc[:, [60]].to_numpy()
+    Xpls = X.drop(columns=["decision", "decision_o", "match"]).to_numpy()
+    t, u, w_star, c, p, r2 = pls.nipalspls(Xpls, Ypls, A)
+
+    n_pls, A = X.shape            
+    plot_loadings(variable_names, p, "NIPALS PLS", df_name)
+    plot_scores(t, "NIPALS PLS", df_name)
+    # sig.spe(df, n_pls, t, p, Xpls)
+    # sig.hotellings_t2(t)
+
+def run_nipalsplsnan(df, df_name, A):
+    binoms = std.binomial_set(df)
+    X = std.normal_scale(df, binoms)
+
+    variable_names = list(X.columns)
+    variable_names.remove("decision")
+    variable_names.remove("decision_o")
+    variable_names.remove("match")
+
+    # pls
+    Ypls = X.iloc[:, [60]].to_numpy()
+    Xpls = X.drop(columns=["decision", "decision_o", "match"]).to_numpy()
+    t, u, w_star, c, p, r2 = pls.nipalspls_NaN(Xpls, Ypls, A)
+
+    n_pls, A = X.shape            
+    plot_loadings(variable_names, p, "NIPALS PLS NAN", df_name)
+    plot_scores(t, "NIPALS PLS NAN", df_name)
+    # sig.spe(df, n_pls, t, p, Xpls)
+    # sig.hotellings_t2(t)
+
+def run_sklearnpls(df, df_name, A):
+    binoms = std.binomial_set(df)
+    X = std.normal_scale(df, binoms)
+
+    variable_names = list(X.columns)
+    variable_names.remove("decision")
+    variable_names.remove("decision_o")
+    variable_names.remove("match")
+
+    # pls
+    Ypls = X.iloc[:, [60]].to_numpy()
+    Xpls = X.drop(columns=["decision", "decision_o", "match"]).to_numpy()
+    t, u, w_star, c, p, r2 = pls.sklearnpls(Xpls, Ypls, A)
+
+    n_pls, A = X.shape            
+    plot_loadings(variable_names, p, "NIPALS PLS - sklearn", df_name)
+    plot_scores(t, "NIPALS PLS -sklearn", df_name)
+    scree.scree_plot(A, r2)
+    # sig.spe(df, n_pls, t, p, Xpls)
+    # sig.hotellings_t2(t)
+
 def main():
     sdg_imputed = "../data/cleaned/speeddating_grouped_imputed.csv"
-    sdte_imputed = "../data/cleaned/speeddating_target_encoded_imputed.csv"
     sdg_NaN = "../data/cleaned/speeddating_grouped_NaN.csv"
-    sdte_NaN = "../data/cleaned/speeddating_target_encoded_NaN.csv"
 
     df_gi = pd.read_csv(sdg_imputed)
-    df_tei = pd.read_csv(sdte_imputed)
     df_gn = pd.read_csv(sdg_NaN)
-    df_ten = pd.read_csv(sdte_NaN)
 
-    dfs = [df_gi, df_tei]
-    df_names = ["SDImp_FGroups", "SDImp_FTEncodings"]
-    # dfs = [df_gi, df_tei, df_gn, df_ten]
-    # df_names = ["SDImp_FGroups", "SDImp_FTEncodings", "SDNaN_FTGroups", "SDNaN_FTEncodings"]
+    numComponents = 20
 
-    for idx, df in enumerate(dfs):
-        distribution(df)
-        binoms = std.binomial_set(df)
-        X = std.normal_scale(df, binoms)
-
-        variable_names = X.columns 
-        variable_names2 = list(variable_names)
-        variable_names2.remove("decision")
-        variable_names2.remove("decision_o")
-        variable_names2.remove("match")
-
-        # nipals pca
-        t1, p1, r21 = pca.nipalspca(X.values, 3)
-        n1, A1 = X.shape
-        plot_loadings(variable_names, p1, "NIPALS PCA", df_names[idx])
-        plot_scores(t1, "NIPALS PCA", df_names[idx])
-        sig.spe(df, n1, t1, p1, X) # spe
-        sig.hotellings_t2(t1)
-
-        # evd pca
-        if idx < 2:
-            t2, p2, r22 = pca.evd_pca(X, 3)
-            t2_np = t2.to_numpy()
-            plot_loadings(variable_names, p2, "EVD PCA", df_names[idx])
-            plot_scores(t2_np, "EVD PCA", df_names[idx])
-            sig.spe(df, n1, t2_np, p2, X) # spe
-            sig.hotellings_t2(t2_np)
-
-        # pls
-            Xpls = df.iloc[:, list(range(0, 58)) + list(range(61, df.shape[1]))].to_numpy()
-            binoms = std.binomial_set(df)
-            Xpls = std.normal_scale(Xpls, binoms)
-            Ypls = df.iloc[:, [58]].to_numpy()
-            t, u, w_star, c, p, r2 = pls.nipalspls(Xpls, Ypls, 3)
-
-            n_pls, A2 = X.shape            
-            plot_loadings(variable_names2, p, "NIPALS PLS", df_names[idx])
-            plot_scores(t, "NIPALS PLS", df_names[idx])
-            sig.spe(df, n_pls, t, p, Xpls)
-            sig.hotellings_t2(t)
-
-        # heatmap
-        # plt.subplots(figsize=(20,15))
-        # ax = plt.axes()
-        # ax.set_title("Correlation Heatmap")
-        # corr = df.corr()
-        # sns.heatmap(corr,
-        #             xticklabels=corr.columns.values,
-        #             yticklabels=corr.columns.values)
-        # plt.xticks(fontsize=5)
-        # plt.yticks(fontsize=5)
+    distribution(df_gi)
+    run_nipalspca(df_gi, "SDImp_FGroups", numComponents)
+    run_nipalspls(df_gi, "SDImp_FGroups", numComponents)
+    run_nipalsplsnan(df_gn, "SDImp_FGroups", numComponents)
+    run_sklearnpls(df_gi, "SDImp_FGroups", numComponents)
 
 if __name__=="__main__":
     main()
