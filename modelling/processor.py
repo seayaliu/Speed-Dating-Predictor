@@ -6,6 +6,7 @@ import seaborn as sns
 import stat_sig as sig
 import scree
 import numpy as np
+from sklearn.model_selection import KFold
 # import prince
 
 def distribution(df):
@@ -105,6 +106,7 @@ def plot_top_loadings(p, pc_label, variable_names, num):
 def run_nipalspca(df, A, title):
     binoms = std.binomial_set(df)
     X = std.normal_scale(df, binoms)
+    # cross_validate(X.to_numpy())
     X = X.drop(columns=["decision", "decision_o", "match"])
 
     # nipals pca
@@ -122,6 +124,15 @@ def save_results(t, file_name):
     df = pd.DataFrame(t, columns=[f'PC{i+1}' for i in range(t.shape[1])])
     df.to_csv(file_name, index=False)
 
+def cross_validate(X):
+    groups = KFold(n_splits=10, shuffle=True, random_state=52)
+
+    r2_components, q2_components = pca.kfold_pca(X, groups)
+
+    for i, (r2, q2) in enumerate(zip(r2_components, q2_components), start=1):
+        print(f"Components: {i}, R²: {r2:.4f}, Q²: {q2:.4f}")
+
+
 def main():
     sdg_imputed = "../data/cleaned/speeddating_grouped_imputed.csv"
     sdg_5050 = "../data/cleaned/speeddating_grouped_imputed_balanced5050.csv"
@@ -131,16 +142,16 @@ def main():
     df_5050 =pd.read_csv(sdg_5050)
     df_4060 = pd.read_csv(sdg_4060)
 
-    numComponents = 20
+    numComponents = 18
 
-    t1, p1, r21 = run_nipalspca(df_gi, numComponents, " - NIPALS PCA, 20 PCs")
-    save_results(t1, "scores_A20.csv")
+    t1, p1, r21 = run_nipalspca(df_gi, numComponents, " - NIPALS PCA, 18 PCs")
+    save_results(t1, "scores_A18.csv")
 
-    t50, p50, r250 = run_nipalspca(df_5050, numComponents, " - NIPALS PCA, 20 PCs, Undersampled Data (50% Match 1)")
-    save_results(t50, "scores_A45_5050balance.csv")
+    t50, p50, r250 = run_nipalspca(df_5050, numComponents, " - NIPALS PCA, 18 PCs, Undersampled Data (50% Match 1)")
+    save_results(t50, "scores_A18_5050balance.csv")
 
-    t40, p40, r240 = run_nipalspca(df_4060, numComponents, "- NIPALS PCA, 20 PCs, Undersampled Data (40% Match 1)")
-    save_results(t40, "scores_A45_4060balance.csv")
+    t40, p40, r240 = run_nipalspca(df_4060, numComponents, "- NIPALS PCA, 18 PCs, Undersampled Data (40% Match 1)")
+    save_results(t40, "scores_A18_4060balance.csv")
     
 
 if __name__=="__main__":
