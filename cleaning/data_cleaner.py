@@ -100,12 +100,13 @@ def standardize_data(df):
     X_c[non_binoms] = (X_c[non_binoms] - X_c[non_binoms].mean(axis=0)) / X_c[non_binoms].std(axis=0, ddof=1)
     return X_c
 
-def even_matches(df):
+def mod_matches(df, split):
     match1 = df[df["match"] == 1]
     match0 = df[df["match"] == 0]
 
-    n = len(match1)
-    sample_match0 = match0.sample(n, random_state=42)
+    n = len(match1) // split
+    n0 = n*(10-split)
+    sample_match0 = match0.sample(n0, random_state=42)
 
     df_balanced = pd.concat([match1, sample_match0]).sample(frac=1, random_state=42).reset_index(drop=True)
 
@@ -121,9 +122,15 @@ def main():
 
     df1_te_imputed = impute_data(df1_te)
     df2_group_imputed = impute_data(df2_group)
-    df2_group_imputed_balanced = even_matches(df2_group_imputed)
+
+    df2_group_imputed_5050 = mod_matches(df2_group_imputed, 5)
+    df2_group_imputed_4060 = mod_matches(df2_group_imputed, 4)
+    df2_group_imputed_3070 = mod_matches(df2_group_imputed, 3)
 
     df2_group_imputed_scaled = standardize_data(df2_group_imputed)
+    df2_group_imputed50_scaled = standardize_data(df2_group_imputed_5050)
+    df2_group_imputed40_scaled = standardize_data(df2_group_imputed_4060)
+    df2_group_imputed30_scaled = standardize_data(df2_group_imputed_3070)
 
     df1_te.to_csv("../data/cleaned/speeddating_target_encoded_NaN.csv", index=False)
     df2_group.to_csv("../data/cleaned/speeddating_grouped_NaN.csv", index=False)
@@ -131,8 +138,16 @@ def main():
     df1_te_imputed.to_csv("../data/cleaned/speeddating_target_encoded_imputed.csv", index=False)
     df2_group_imputed.to_csv("../data/cleaned/speeddating_grouped_imputed.csv", index=False)
 
+    df2_group_imputed_5050.to_csv("../data/cleaned/speeddating_grouped_imputed_balanced5050.csv", index=False)
+    df2_group_imputed_4060.to_csv("../data/cleaned/speeddating_grouped_imputed_balanced4060.csv", index=False)
+    df2_group_imputed_3070.to_csv("../data/cleaned/speeddating_grouped_imputed_balanced3070.csv", index=False)
+
     df2_group_imputed_scaled.to_csv("../data/cleaned/speeddating_grouped_imputed_scaled.csv", index=False)
-    df2_group_imputed_balanced.to_csv("../data/cleaned/speeddating_grouped_imputed_balanced5050.csv", index=False)
+    df2_group_imputed50_scaled.to_csv("../data/cleaned/speeddating_grouped_imputed_scaled_balanced5050.csv", index=False)
+    df2_group_imputed40_scaled.to_csv("../data/cleaned/speeddating_grouped_imputed_scaled_balanced4060.csv", index=False)
+    df2_group_imputed30_scaled.to_csv("../data/cleaned/speeddating_grouped_imputed_scaled_balanced3070.csv", index=False)
+
+
 
 if __name__=="__main__":
     main()
