@@ -128,9 +128,6 @@ def main():
     df2_group_imputed_3070 = mod_matches(df2_group_imputed, 3)
 
     df2_group_imputed_scaled = standardize_data(df2_group_imputed)
-    df2_group_imputed50_scaled = standardize_data(df2_group_imputed_5050)
-    df2_group_imputed40_scaled = standardize_data(df2_group_imputed_4060)
-    df2_group_imputed30_scaled = standardize_data(df2_group_imputed_3070)
 
     df1_te.to_csv("../data/cleaned/speeddating_target_encoded_NaN.csv", index=False)
     df2_group.to_csv("../data/cleaned/speeddating_grouped_NaN.csv", index=False)
@@ -143,11 +140,6 @@ def main():
     df2_group_imputed_3070.to_csv("../data/cleaned/speeddating_grouped_imputed_balanced3070.csv", index=False)
 
     df2_group_imputed_scaled.to_csv("../data/cleaned/speeddating_grouped_imputed_scaled.csv", index=False)
-    df2_group_imputed50_scaled.to_csv("../data/cleaned/speeddating_grouped_imputed_scaled_balanced5050.csv", index=False)
-    df2_group_imputed40_scaled.to_csv("../data/cleaned/speeddating_grouped_imputed_scaled_balanced4060.csv", index=False)
-    df2_group_imputed30_scaled.to_csv("../data/cleaned/speeddating_grouped_imputed_scaled_balanced3070.csv", index=False)
-
-
 
 if __name__=="__main__":
     main()
