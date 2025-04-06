@@ -25,8 +25,8 @@ def spe(df, n, t, p, X):
 
     greater_95 = np.where(SPE > spe_95)[0] + 1
     greater_99 = np.where(SPE > spe_99)[0] + 1
-    # print(f"Observations exceeding 95% CI: {greater_95}")
-    # print(f"Observations exceeding 99% CI: {greater_99}")
+    print("Number of observations exceeding 95% CI:", len(greater_95))
+    print("Number of observations exceeding 99% CI:", len(greater_99))
 
 def hotellings_t2(t):
     n, A = t.shape
