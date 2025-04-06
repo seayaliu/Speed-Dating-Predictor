@@ -132,7 +132,7 @@ def main():
     df2_group_imputed.to_csv("../data/cleaned/speeddating_grouped_imputed.csv", index=False)
 
     df2_group_imputed_scaled.to_csv("../data/cleaned/speeddating_grouped_imputed_scaled.csv", index=False)
-    df2_group_imputed_balanced.to_csv("../data/cleaned/speeddating_grouped_imputed_balanced.csv", index=False)
+    df2_group_imputed_balanced.to_csv("../data/cleaned/speeddating_grouped_imputed_balanced5050.csv", index=False)
 
 if __name__=="__main__":
     main()
