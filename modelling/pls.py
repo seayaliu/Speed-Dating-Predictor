@@ -5,7 +5,10 @@ def sklearnpls(X, Y, A):
     pls = PLSRegression(A)
     pls.fit(X, Y)
     # y_pred = pls.predict(X)
-    return pls.x_scores_, pls.y_scores_, pls.x_weights_, pls.y_weights_, pls.x_loadings_, pls.score(X, Y)
+    SSY_total = np.sum(np.square(Y - np.mean(Y)))  # Total variance in Y
+    explained_variance = [np.sum(np.square(pls.y_scores_[:, i])) / SSY_total for i in range(A)]
+
+    return pls.x_scores_, pls.y_scores_, pls.x_weights_, pls.y_weights_, pls.x_loadings_, np.array(explained_variance)
 
 def nipalspls(X, Y, A): # A = number of components, use A = 3 for assignment
 
@@ -111,7 +114,7 @@ def nipalspls_NaN(X, Y, A): # A = number of components, use A = 3 for assignment
         y_cs = y_cs - np.outer(t_pls, c_pls)
 
         num = np.nanvar(y_cs, axis=0)
-        r2_pls = 1 - num/explained_variance
+        r2_pls = num/explained_variance
         r2[i] = np.nansum(r2_pls)
 
         t[:, i] = t_pls

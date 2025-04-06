@@ -84,76 +84,36 @@ def plot_scores(t, method, data_name):
 def run_nipalspca(df, df_name, A):
     binoms = std.binomial_set(df)
     X = std.normal_scale(df, binoms)
+    X = X.drop(columns=["decision", "decision_o", "match"])
 
     # nipals pca
     variable_names = X.columns 
     t1, p1, r21 = pca.nipalspca(X.values, A)
     n1, A = X.shape
     plot_loadings(variable_names, p1, "NIPALS PCA", df_name)
-    plot_scores(t1, "NIPALS PCA", df_name)
+    # plot_scores(t1, "NIPALS PCA", df_name)
+    scree.scree_plot(A, r21)
     # sig.spe(df, n1, t1, p1, X)
     # sig.hotellings_t2(t1)
+    return t1, p1, r21
 
-def run_nipalspls(df, df_name, A):
-    binoms = std.binomial_set(df)
-    X = std.normal_scale(df, binoms)
+def run_nipalspca_NaN(df, df_name, A):
+    X = df.drop(columns=["decision", "decision_o", "match"])
 
-    variable_names = list(X.columns)
-    variable_names.remove("decision")
-    variable_names.remove("decision_o")
-    variable_names.remove("match")
+    # nipals pca
+    variable_names = X.columns 
+    t1, p1, r21 = pca.nipalspcaNaN(X.values, A)
+    n1, A = X.shape
+    plot_loadings(variable_names, p1, "NIPALS PCA NaN", df_name)
+    # plot_scores(t1, "NIPALS PCA", df_name)
+    scree.scree_plot(A, r21)
+    # sig.spe(df, n1, t1, p1, X)
+    # sig.hotellings_t2(t1)
+    return t1, p1, r21
 
-    # pls
-    Ypls = X.iloc[:, [60]].to_numpy()
-    Xpls = X.drop(columns=["decision", "decision_o", "match"]).to_numpy()
-    t, u, w_star, c, p, r2 = pls.nipalspls(Xpls, Ypls, A)
-
-    n_pls, A = X.shape            
-    plot_loadings(variable_names, p, "NIPALS PLS", df_name)
-    plot_scores(t, "NIPALS PLS", df_name)
-    # sig.spe(df, n_pls, t, p, Xpls)
-    # sig.hotellings_t2(t)
-
-def run_nipalsplsnan(df, df_name, A):
-    binoms = std.binomial_set(df)
-    X = std.normal_scale(df, binoms)
-
-    variable_names = list(X.columns)
-    variable_names.remove("decision")
-    variable_names.remove("decision_o")
-    variable_names.remove("match")
-
-    # pls
-    Ypls = X.iloc[:, [60]].to_numpy()
-    Xpls = X.drop(columns=["decision", "decision_o", "match"]).to_numpy()
-    t, u, w_star, c, p, r2 = pls.nipalspls_NaN(Xpls, Ypls, A)
-
-    n_pls, A = X.shape            
-    plot_loadings(variable_names, p, "NIPALS PLS NAN", df_name)
-    plot_scores(t, "NIPALS PLS NAN", df_name)
-    # sig.spe(df, n_pls, t, p, Xpls)
-    # sig.hotellings_t2(t)
-
-def run_sklearnpls(df, df_name, A):
-    binoms = std.binomial_set(df)
-    X = std.normal_scale(df, binoms)
-
-    variable_names = list(X.columns)
-    variable_names.remove("decision")
-    variable_names.remove("decision_o")
-    variable_names.remove("match")
-
-    # pls
-    Ypls = X.iloc[:, [60]].to_numpy()
-    Xpls = X.drop(columns=["decision", "decision_o", "match"]).to_numpy()
-    t, u, w_star, c, p, r2 = pls.sklearnpls(Xpls, Ypls, A)
-
-    n_pls, A = X.shape            
-    plot_loadings(variable_names, p, "NIPALS PLS - sklearn", df_name)
-    plot_scores(t, "NIPALS PLS -sklearn", df_name)
-    scree.scree_plot(A, r2)
-    # sig.spe(df, n_pls, t, p, Xpls)
-    # sig.hotellings_t2(t)
+def save_results(t):
+    df = pd.DataFrame(t, columns=[f'PC{i+1}' for i in range(t.shape[1])])
+    df.to_csv('pca_scores.csv', index=False)
 
 def main():
     sdg_imputed = "../data/cleaned/speeddating_grouped_imputed.csv"
@@ -162,13 +122,17 @@ def main():
     df_gi = pd.read_csv(sdg_imputed)
     df_gn = pd.read_csv(sdg_NaN)
 
-    numComponents = 20
+    numComponents = 100
+    numComponents1 = 20
+    numComponents2 = 45
 
-    distribution(df_gi)
-    run_nipalspca(df_gi, "SDImp_FGroups", numComponents)
-    run_nipalspls(df_gi, "SDImp_FGroups", numComponents)
-    run_nipalsplsnan(df_gn, "SDImp_FGroups", numComponents)
-    run_sklearnpls(df_gi, "SDImp_FGroups", numComponents)
+
+    # distribution(df_gi)
+    t1, p1, r211 = run_nipalspca(df_gi, "SDImp_FGroups", numComponents1)
+    save_results(t1)
+    # run_sk_pca(df_gi, "SDImp_FGroups", numComponents)
+    # run_nipalspca_NaN(df_gn, "SDNaN_FGroups", numComponents1)
+    
 
 if __name__=="__main__":
     main()
