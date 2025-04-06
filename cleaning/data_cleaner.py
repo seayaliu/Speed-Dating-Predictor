@@ -89,6 +89,17 @@ def impute_data(df):
         df2[col] = df2[col].fillna(median)
     return df2
 
+def standardize_data(df):
+    binoms = []
+    for col in df.columns:
+        binom = set(df[col].unique()).issubset({0, 1})
+        if binom == True:
+            binoms.append(col)
+    non_binoms = [col for col in df.columns if col not in binoms]
+    X_c = df.copy()
+    X_c[non_binoms] = (X_c[non_binoms] - X_c[non_binoms].mean(axis=0)) / X_c[non_binoms].std(axis=0, ddof=1)
+    return X_c
+
 # main function
 def main():
     excel_to_csv("../data/original/speed_dating.xlsx", "../data/original/backup.csv")
@@ -99,12 +110,15 @@ def main():
 
     df1_te_imputed = impute_data(df1_te)
     df2_group_imputed = impute_data(df2_group)
+    df2_group_imputed_scaled = standardize_data(df2_group_imputed)
 
     df1_te.to_csv("../data/cleaned/speeddating_target_encoded_NaN.csv", index=False)
     df2_group.to_csv("../data/cleaned/speeddating_grouped_NaN.csv", index=False)
     
     df1_te_imputed.to_csv("../data/cleaned/speeddating_target_encoded_imputed.csv", index=False)
     df2_group_imputed.to_csv("../data/cleaned/speeddating_grouped_imputed.csv", index=False)
+
+    df2_group_imputed_scaled.to_csv("../data/cleaned/speeddating_grouped_imputed_scaled.csv", index=False)
 
 if __name__=="__main__":
     main()

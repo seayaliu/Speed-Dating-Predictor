@@ -128,10 +128,10 @@ def main():
 
 
     # distribution(df_gi)
-    t1, p1, r211 = run_nipalspca(df_gi, "SDImp_FGroups", numComponents1)
-    save_results(t1)
+    # t1, p1, r211 = run_nipalspca(df_gi, "SDImp_FGroups", numComponents1)
+    # save_results(t1)
     # run_sk_pca(df_gi, "SDImp_FGroups", numComponents)
-    # run_nipalspca_NaN(df_gn, "SDNaN_FGroups", numComponents1)
+    run_nipalspca_NaN(df_gn, "SDNaN_FGroups", numComponents1)
     
 
 if __name__=="__main__":
