@@ -100,6 +100,17 @@ def standardize_data(df):
     X_c[non_binoms] = (X_c[non_binoms] - X_c[non_binoms].mean(axis=0)) / X_c[non_binoms].std(axis=0, ddof=1)
     return X_c
 
+def even_matches(df):
+    match1 = df[df["match"] == 1]
+    match0 = df[df["match"] == 0]
+
+    n = len(match1)
+    sample_match0 = match0.sample(n, random_state=42)
+
+    df_balanced = pd.concat([match1, sample_match0]).sample(frac=1, random_state=42).reset_index(drop=True)
+
+    return df_balanced
+
 # main function
 def main():
     excel_to_csv("../data/original/speed_dating.xlsx", "../data/original/backup.csv")
@@ -110,6 +121,8 @@ def main():
 
     df1_te_imputed = impute_data(df1_te)
     df2_group_imputed = impute_data(df2_group)
+    df2_group_imputed_balanced = even_matches(df2_group_imputed)
+
     df2_group_imputed_scaled = standardize_data(df2_group_imputed)
 
     df1_te.to_csv("../data/cleaned/speeddating_target_encoded_NaN.csv", index=False)
@@ -119,6 +132,7 @@ def main():
     df2_group_imputed.to_csv("../data/cleaned/speeddating_grouped_imputed.csv", index=False)
 
     df2_group_imputed_scaled.to_csv("../data/cleaned/speeddating_grouped_imputed_scaled.csv", index=False)
+    df2_group_imputed_balanced.to_csv("../data/cleaned/speeddating_grouped_imputed_balanced.csv", index=False)
 
 if __name__=="__main__":
     main()
