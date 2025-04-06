@@ -76,9 +76,8 @@ def nipalspcaNaN(x, A=2):
     
             t_pca_new = np.nansum(x * p_pca.T, axis=1).reshape(-1, 1) / np.nansum((p_pca.T)**2)  #And then get the scores from the loadings
 
-            
             #THE STEP AFTER IS CHECKING FOR CONVERGENCE
-            if np.linalg.norm(t_pca- t_pca_new) < 1e-6:  #from slides: they said to use up until e10-8 so that's what we're doing
+            if np.linalg.norm(t_pca - t_pca_new) < 1e-6:  #from slides: they said to use up until e10-8 so that's what we're doing
                 break
             t_pca = t_pca_new #store right after as the slides say LOL
 
