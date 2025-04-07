@@ -35,7 +35,7 @@ def plot_loadings(variable_names, p, name):
 
     #PLOTTING FOR LOADINGS FOR PC1
     title1 = "PC1 Loadings" + name
-    plt.bar(variable_names, pc1_loadings, color='purple', alpha=0.8,)
+    plt.bar(variable_names, pc1_loadings, color='#791523', alpha=0.8,)
     plt.title(title1, fontsize=12)
     plt.ylabel("Magnitude of Loadings", fontsize=12)
     plt.xlabel("Variables", fontsize=12)
@@ -48,7 +48,7 @@ def plot_loadings(variable_names, p, name):
 
     #PLOTTING FOR LOADINGS FOR PC2
     title2 = "PC2 Loadings" + name
-    plt.bar(variable_names, pc2_loadings, color='pink', alpha=0.8)
+    plt.bar(variable_names, pc2_loadings, color='#791523', alpha=0.8)
     plt.title(title2, fontsize=12)
     plt.ylabel("Magnitude of Loadings", fontsize=12)
     plt.xlabel("Variables",fontsize=12)
@@ -61,7 +61,7 @@ def plot_loadings(variable_names, p, name):
 
     #PLOTTING FOR LOADINGS FOR PC20
     title2 = "Last PC Loadings" + name
-    plt.bar(variable_names, pclast_loadings, color='blue', alpha=0.8)
+    plt.bar(variable_names, pclast_loadings, color='#791523', alpha=0.8)
     plt.title(title2, fontsize=12)
     plt.ylabel("Magnitude of Loadings", fontsize=12)
     plt.xlabel("Variables",fontsize=12)
@@ -79,7 +79,7 @@ def plot_scores(t, name):
 
     #PLOTTING FOR SCORES
     titlet = "Score Plot" + name
-    plt.scatter(pc1_scores, pc2_scores, color='purple', alpha = 0.08)
+    plt.scatter(pc1_scores, pc2_scores, color='#791523', alpha = 0.08)
     plt.title(titlet, fontsize=12)
     plt.ylabel("T2", fontsize=12)
     plt.xlabel("T1",fontsize=12)
@@ -91,10 +91,10 @@ def plot_top_loadings(p, pc_label, variable_names, num):
     top_idxs = np.argsort(np.abs(p))[-num:][::-1]
     top_varis = [variable_names[i] for i in top_idxs]
     top_p = p[top_idxs]
-    top_p = abs(top_p)
+    top_p = top_p
 
     title = "Top " + str(num) + " Loadings for " + pc_label 
-    plt.bar(top_varis, top_p, alpha=0.8)
+    plt.bar(top_varis, top_p, color = '#791523', alpha=0.8)
     plt.title(title, fontsize=12)
     plt.ylabel("Magnitude of Loadings", fontsize=12)
     plt.xlabel("Variables", fontsize=12)

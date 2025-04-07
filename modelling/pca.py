@@ -59,7 +59,7 @@ def get_q2_please(x_true, x_pred):
 def kfold_pca(X, groups):
     r2_components = []
     q2_components = []
-    for n_components in range(1, 41):
+    for n_components in range(1, 21):
         print("go")
         r2_groups = []
         q2_groups = []
