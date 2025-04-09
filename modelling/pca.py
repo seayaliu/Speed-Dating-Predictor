@@ -60,7 +60,6 @@ def kfold_pca(X, groups):
     r2_components = []
     q2_components = []
     for n_components in range(1, 21):
-        print("go")
         r2_groups = []
         q2_groups = []
         for train_i, test_i in groups.split(X):

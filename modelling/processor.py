@@ -150,8 +150,8 @@ def main():
     t50, p50, r250 = run_nipalspca(df_5050, numComponents, " - NIPALS PCA, 18 PCs, Undersampled Data (50% Match 1)")
     save_results(t50, "scores_A18_5050balance.csv")
 
-    t40, p40, r240 = run_nipalspca(df_4060, numComponents, "- NIPALS PCA, 18 PCs, Undersampled Data (40% Match 1)")
-    save_results(t40, "scores_A18_4060balance.csv")
+    # t40, p40, r240 = run_nipalspca(df_4060, numComponents, "- NIPALS PCA, 18 PCs, Undersampled Data (40% Match 1)")
+    # save_results(t40, "scores_A18_4060balance.csv")
     
 
 if __name__=="__main__":
