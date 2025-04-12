@@ -7,33 +7,15 @@ import stat_sig as sig
 import scree
 import numpy as np
 from sklearn.model_selection import KFold
+import pls
 # import prince
 
-def distribution(df):
-    fig, axes = plt.subplots(9, 9) 
-    
-    idx = 0
-    for i in range(0, 9):
-        for j in range(0, 9):                
-            col_name = df.columns[idx]
-            col_data = df.iloc[:, idx] 
-            std.create_distribution_plot(col_data, col_name, axes, i, j)
-            j+=1
-            idx +=1
-            if idx > 75:
-                break
-
-    plt.tight_layout()
-    plt.subplots_adjust(left=0.125, right=0.9, bottom=0.1, top=0.9, hspace=0.05, wspace=0.15)
-    plt.show()
-
-
 def plot_loadings(variable_names, p, name):
-    pc1_loadings = p[:, 0]  #loadings for PC1
-    pc2_loadings = p[:, 1]  #loadings for PC2
-    pc3_loadings = p[:, 2]  #loadings for PC3
+    pc1_loadings = p[:, 0]      # loadings for PC1
+    pc2_loadings = p[:, 1]      # loadings for PC2
+    pc3_loadings = p[:, 2]      # loadings for PC3
 
-    #PLOTTING FOR LOADINGS FOR PC1
+    # plotting loadings for PC1
     title1 = "PC1 Loadings" + name
     plt.bar(variable_names, pc1_loadings, color='#791523', alpha=0.8)
     plt.title(title1, fontsize=12)
@@ -44,9 +26,10 @@ def plot_loadings(variable_names, p, name):
     plt.tight_layout()
     plt.show()
 
+    # plotting the top 30 loadings for PC1
     plot_top_loadings(pc1_loadings, "PC1", variable_names, 30)
 
-    #PLOTTING FOR LOADINGS FOR PC2
+    # plotting loadings for PC2
     title2 = "PC2 Loadings" + name
     plt.bar(variable_names, pc2_loadings, color='#791523', alpha=0.8)
     plt.title(title2, fontsize=12)
@@ -57,9 +40,10 @@ def plot_loadings(variable_names, p, name):
     plt.tight_layout()
     plt.show()
 
+    # plotting the top 30 loadings for PC2
     plot_top_loadings(pc2_loadings, "PC2", variable_names, 30)
 
-    #PLOTTING FOR LOADINGS FOR PC3
+    # plotting loadings for PC3
     title3 = "PC3 Loadings" + name
     plt.bar(variable_names, pc3_loadings, color='#791523', alpha=0.8)
     plt.title(title3, fontsize=12)
@@ -70,12 +54,13 @@ def plot_loadings(variable_names, p, name):
     plt.tight_layout()
     plt.show()
 
+    # plotting the top 30 loadings for PC3
     plot_top_loadings(pc3_loadings, "PC3", variable_names, 30)
 
 
 def plot_scores(t, name):
-    pc1_scores = t[:, 0]
-    pc2_scores = t[:, 1]
+    pc1_scores = t[:, 0]    # scores for PC1
+    pc2_scores = t[:, 1]    # scores for PC2
 
     #PLOTTING FOR SCORES
     titlet = "Score Plot" + name
@@ -92,8 +77,6 @@ def plot_top_loadings(p, pc_label, variable_names, num):
     top_varis = [variable_names[i] for i in top_idxs]
     top_p = p[top_idxs]
     top_p = top_p
-
-    print(type(top_p))
 
     title = "Top " + str(num) + " Loadings for " + pc_label 
     plt.barh(np.flip(top_varis), np.flip(top_p), color = '#791523', alpha=0.8)
@@ -122,6 +105,20 @@ def run_nipalspca(df, A, title):
     sig.spe(df, n1, t1, p1, X)
     return t1, p1, r21
 
+def test_nipalspls(df, A, title):
+    binoms = std.binomial_set(df)
+    X = std.normal_scale(df, binoms)
+    Y = X[['match']].copy()
+    X = X.drop(columns=["decision", "decision_o", "match"])
+
+    variable_names = X.columns 
+    t, u, w_star, c, p, r2 = pls.nipalspls(X.to_numpy(), Y.to_numpy(), A)
+    n1, A = X.shape
+    # plot_loadings(variable_names, p, title)
+    # plot_scores(t1, title)
+    print(title, "Fit -", n1, "Observations")
+    scree.scree_plot(A, r2)
+
 def save_results(t, file_name):
     df = pd.DataFrame(t, columns=[f'PC{i+1}' for i in range(t.shape[1])])
     df.to_csv(file_name, index=False)
@@ -146,15 +143,14 @@ def main():
 
     numComponents = 18
 
+    test_nipalspls(df_gi, 40, " - NIPALS PLS, 18 PCs")
+
     t1, p1, r21 = run_nipalspca(df_gi, numComponents, " - NIPALS PCA, 18 PCs")
     save_results(t1, "scores_A18.csv")
 
     t50, p50, r250 = run_nipalspca(df_5050, numComponents, " - NIPALS PCA, 18 PCs, Undersampled (50% Match=0)")
     save_results(t50, "scores_A18_5050balance.csv")
 
-    # t40, p40, r240 = run_nipalspca(df_4060, numComponents, "- NIPALS PCA, 18 PCs, Undersampled (40% Match=)")
-    # save_results(t40, "scores_A18_4060balance.csv")
-    
 
 if __name__=="__main__":
     main()

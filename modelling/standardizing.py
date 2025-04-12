@@ -3,6 +3,23 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from fitter import Fitter
 import pandas as pd
+import standardizing as std
+
+def distribution(df):
+    fig, axes = plt.subplots(9, 9) 
+    idx = 0
+    for i in range(0, 9):
+        for j in range(0, 9):                
+            col_name = df.columns[idx]
+            col_data = df.iloc[:, idx] 
+            std.create_distribution_plot(col_data, col_name, axes, i, j)
+            j+=1
+            idx +=1
+            if idx > 75:
+                break
+    plt.tight_layout()
+    plt.subplots_adjust(left=0.125, right=0.9, bottom=0.1, top=0.9, hspace=0.05, wspace=0.15)
+    plt.show()
 
 def create_distribution_plot(data, xlabel, axes, x, y):
     sns.histplot(data, bins=30, ax=axes[x, y], color='blue')

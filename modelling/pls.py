@@ -4,6 +4,7 @@ from sklearn.cross_decomposition import PLSRegression
 def sklearnpls(X, Y, A):
     pls = PLSRegression(A)
     pls.fit(X, Y)
+    pls.explained
     # y_pred = pls.predict(X)
     SSY_total = np.sum(np.square(Y - np.mean(Y)))  # Total variance in Y
     explained_variance = [np.sum(np.square(pls.y_scores_[:, i])) / SSY_total for i in range(A)]
@@ -24,7 +25,9 @@ def nipalspls(X, Y, A): # A = number of components, use A = 3 for assignment
     p = np.zeros((x_cs.shape[1], A))
     r2 = np.zeros(A) 
 
-    explained_variance = np.var(y_cs, axis=0)
+    explained_variance = np.sum(np.var(x_cs, axis=0))
+    print("expl")
+    print(explained_variance)
 
     #goes through for number of components that want to be calculated 
     for i in range(A):
@@ -51,13 +54,14 @@ def nipalspls(X, Y, A): # A = number of components, use A = 3 for assignment
         p[:, i] = p_i
 
         # deflate data
-        temp = y_cs
         x_cs = x_cs - np.outer(t_pls, p_i)
         y_cs = y_cs - np.outer(t_pls, c_pls)
 
-        num = np.var(temp, axis=0)
+        num = np.sum(np.var(x_cs, axis=0))
+        print(num/explained_variance)
         r2_pls = 1 - num/explained_variance
         r2[i] = np.sum(r2_pls)
+        print(r2[i])
 
         t[:, i] = t_pls
         u[:, i] = u_pls
