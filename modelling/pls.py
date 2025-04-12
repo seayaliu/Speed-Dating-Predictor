@@ -51,10 +51,11 @@ def nipalspls(X, Y, A): # A = number of components, use A = 3 for assignment
         p[:, i] = p_i
 
         # deflate data
+        temp = y_cs
         x_cs = x_cs - np.outer(t_pls, p_i)
         y_cs = y_cs - np.outer(t_pls, c_pls)
 
-        num = np.var(y_cs, axis=0)
+        num = np.var(temp, axis=0)
         r2_pls = 1 - num/explained_variance
         r2[i] = np.sum(r2_pls)
 

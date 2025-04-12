@@ -93,8 +93,10 @@ def plot_top_loadings(p, pc_label, variable_names, num):
     top_p = p[top_idxs]
     top_p = top_p
 
+    print(type(top_p))
+
     title = "Top " + str(num) + " Loadings for " + pc_label 
-    plt.barh(top_varis, top_p, color = '#791523', alpha=0.8)
+    plt.barh(np.flip(top_varis), np.flip(top_p), color = '#791523', alpha=0.8)
     plt.title(title, fontsize=12)
     plt.xlabel("Magnitude of Loadings", fontsize=12)
     plt.ylabel("Variables", fontsize=12)
@@ -147,10 +149,10 @@ def main():
     t1, p1, r21 = run_nipalspca(df_gi, numComponents, " - NIPALS PCA, 18 PCs")
     save_results(t1, "scores_A18.csv")
 
-    t50, p50, r250 = run_nipalspca(df_5050, numComponents, " - NIPALS PCA, 18 PCs, Undersampled (50% Match=1")
+    t50, p50, r250 = run_nipalspca(df_5050, numComponents, " - NIPALS PCA, 18 PCs, Undersampled (50% Match=0)")
     save_results(t50, "scores_A18_5050balance.csv")
 
-    # t40, p40, r240 = run_nipalspca(df_4060, numComponents, "- NIPALS PCA, 18 PCs, Undersampled (40% Match=1)")
+    # t40, p40, r240 = run_nipalspca(df_4060, numComponents, "- NIPALS PCA, 18 PCs, Undersampled (40% Match=)")
     # save_results(t40, "scores_A18_4060balance.csv")
     
 
