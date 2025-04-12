@@ -2,18 +2,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import f, chi2
 
+# calculate spe
 def spe(df, n, t, p, X):
+    # calculate SPE
     X_hat = np.dot(t, p.T)
     residuals = X - X_hat
     SPE = np.sum((X - X_hat) ** 2, axis=1)
 
+    # prep to get confidence intervals at 95% and 99%
     mean = np.mean(SPE)
     var = np.std(SPE) ** 2
     doff = 2 * (mean ** 2) / var
 
+    # get confidence limits for spe plot
     spe_95 = (var/(2*mean)) * chi2.ppf(0.95, doff)
     spe_99 = (var/(2*mean)) * chi2.ppf(0.99, doff)
 
+    # plot spe data
     plt.plot(range(1, n + 1), SPE, linewidth=0.5, marker='.', linestyle='-', label="SPE", color='#791523')
     plt.axhline(y=spe_95, color='#FDBF57', linestyle='--', label="95% Confidence Interval")
     plt.axhline(y=spe_99, color='#495965', linestyle='-.', label="99% Confidence Interval")
@@ -23,11 +28,13 @@ def spe(df, n, t, p, X):
     plt.legend()
     plt.show()
 
+    # print the number of outliers for each limit
     greater_95 = np.where(SPE > spe_95)[0] + 1
     greater_99 = np.where(SPE > spe_99)[0] + 1
     print("Number of observations exceeding 95% CI:", len(greater_95))
     print("Number of observations exceeding 99% CI:", len(greater_99))
 
+# calculate hotelling's t2
 def hotellings_t2(t):
     n, A = t.shape
 

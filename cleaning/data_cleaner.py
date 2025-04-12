@@ -4,16 +4,16 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 import field_mapping as fm
 
+# convert excel to csv
+def excel_to_csv(file_path, file_name):
+    df = pd.read_excel(file_path, index_col=None)
+    df.to_csv(file_name, index=False)  
+
 # strip "b''" byte wrappings from data set items
 def strip_byte(item):
     if isinstance(item, str) and item.startswith("b'") and item.endswith("'"):
         return item[2:-1]
     return item
-
-# convert excel to csv
-def excel_to_csv(file_path, file_name):
-    df = pd.read_excel(file_path, index_col=None)
-    df.to_csv(file_name, index=False)  
 
 # find categorical variables in data set
 def find_non_numerical(data):
@@ -23,11 +23,6 @@ def find_non_numerical(data):
             data[col] = data[col].astype(int)
     str_cols = data.select_dtypes(include=['object']).columns.tolist()
     return str_cols
-
-# replace blank cells and cells with "?" with NaN
-def blank_cells(df):
-    df.replace("?", np.nan, inplace=True)
-    df.replace("", np.nan, inplace=True)
 
 # convert strings to lowercase
 def lowercase(df):
@@ -52,6 +47,12 @@ def target_encoding(df, col_name, outcome, new_col_name):
     df[new_col_name] = df[col_name].map(field_means)
     df.drop(columns=[col_name], inplace=True)
 
+# replace blank cells and cells with "?" with NaN
+def blank_cells(df):
+    df.replace("?", np.nan, inplace=True)
+    df.replace("", np.nan, inplace=True)
+
+# modular primary processing component
 def primary_processor(df):
     df.drop(['wave'], axis = 1, inplace= True)
     df = df.map(strip_byte)
@@ -64,6 +65,7 @@ def primary_processor(df):
     df_encoded = one_hot_encoding(df, target_cols)
     return df_encoded
 
+# processing the categorical variable field
 def field_processing(df):
     df1_te = df.copy()
     df2_group = df.copy()
@@ -77,7 +79,7 @@ def field_processing(df):
 
     return df1_te, df2_group
 
-# data imputation method
+# data median imputation method
 def impute_data(df):
     df2 = df.copy()
     nan_cols = []
@@ -89,6 +91,7 @@ def impute_data(df):
         df2[col] = df2[col].fillna(median)
     return df2
 
+# standardizing data
 def standardize_data(df):
     binoms = []
     for col in df.columns:
@@ -100,6 +103,7 @@ def standardize_data(df):
     X_c[non_binoms] = (X_c[non_binoms] - X_c[non_binoms].mean(axis=0)) / X_c[non_binoms].std(axis=0, ddof=1)
     return X_c
 
+# undersampling data to balance the dataset
 def mod_matches(df, split):
     match1 = df[df["match"] == 1]
     match0 = df[df["match"] == 0]
@@ -114,21 +118,27 @@ def mod_matches(df, split):
 
 # main function
 def main():
+    # extract files
     excel_to_csv("../data/original/speed_dating.xlsx", "../data/original/backup.csv")
     df = pd.read_csv("../data/original/backup.csv")
 
+    # preliminary processing
     df_encoded = primary_processor(df)
-    df1_te, df2_group = field_processing(df_encoded)
+    df1_te, df2_group = field_processing(df_encoded)    # field processing
 
+    # median impute missing values
     df1_te_imputed = impute_data(df1_te)
     df2_group_imputed = impute_data(df2_group)
 
+    # undersample data
     df2_group_imputed_5050 = mod_matches(df2_group_imputed, 5)
     df2_group_imputed_4060 = mod_matches(df2_group_imputed, 4)
     df2_group_imputed_3070 = mod_matches(df2_group_imputed, 3)
 
+    # scale data
     df2_group_imputed_scaled = standardize_data(df2_group_imputed)
 
+    # save processed data as csvs
     df1_te.to_csv("../data/cleaned/speeddating_target_encoded_NaN.csv", index=False)
     df2_group.to_csv("../data/cleaned/speeddating_grouped_NaN.csv", index=False)
     

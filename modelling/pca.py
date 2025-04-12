@@ -26,15 +26,15 @@ def nipalspca(x, A):
             p_pca = p_pca / np.linalg.norm(p_pca)  #normalize loadings as the next step in the NIPALS steps
             t_pca_new = np.dot(x, p_pca)  #And then get the scores from the loadings
             
-            #THE STEP AFTER IS CHECKING FOR CONVERGENCE
-            if np.allclose(t_pca, t_pca_new, atol=1e-8):  #from slides: they said to use up until e10-8 so that's what we're doing
+            # check for convergence
+            if np.allclose(t_pca, t_pca_new, atol=1e-8): 
                 break
-            t_pca = t_pca_new #store right after as the slides say LOL
+            t_pca = t_pca_new
 
         #and now we deflate the data to remove any of the explained variance that we just calculated for the column
         x = x - np.outer(t_pca, p_pca)
 
-        #STORE THE LOADINGS AND SCORES PLEASE
+        # store loadings and scores for this component
         t[:, i] = t_pca
         p[:, i] = p_pca
 
@@ -49,13 +49,13 @@ def nipalspca(x, A):
 
     return t, p, R2
 
-
+# calculate q2 for kfold cross-validation
 def get_q2_please(x_true, x_pred):
     total_var = np.sum((x_true - np.mean(x_true, axis=0)) ** 2)
     press = np.sum((x_true - x_pred) ** 2)
     return 1 - (press / total_var)
 
-
+# kfold testing, training - for cross validation
 def kfold_pca(X, groups):
     r2_components = []
     q2_components = []
@@ -67,7 +67,7 @@ def kfold_pca(X, groups):
             #splitting dataset to get the train and test separately 
             X_train, X_test = X[train_i], X[test_i]
 
-            #NIPALS PCA IS SO BACK
+            # nipals pca on the sets (train & test)
             t_train, p_train, R2_train = nipalspca(X_train, n_components)
 
             #gets r^2 value here for the training data for each iteration
@@ -86,6 +86,3 @@ def kfold_pca(X, groups):
         q2_components.append(np.mean(q2_groups))
 
     return r2_components, q2_components
-
-
-
