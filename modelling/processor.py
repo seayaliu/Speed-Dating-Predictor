@@ -31,15 +31,15 @@ def distribution(df):
 def plot_loadings(variable_names, p, name):
     pc1_loadings = p[:, 0]  #loadings for PC1
     pc2_loadings = p[:, 1]  #loadings for PC2
-    pclast_loadings = p[:, -1]
+    pc3_loadings = p[:, 2]  #loadings for PC3
 
     #PLOTTING FOR LOADINGS FOR PC1
     title1 = "PC1 Loadings" + name
-    plt.bar(variable_names, pc1_loadings, color='#791523', alpha=0.8,)
+    plt.bar(variable_names, pc1_loadings, color='#791523', alpha=0.8)
     plt.title(title1, fontsize=12)
     plt.ylabel("Magnitude of Loadings", fontsize=12)
     plt.xlabel("Variables", fontsize=12)
-    plt.xticks(rotation=90, fontsize=5)
+    plt.xticks(fontsize=5, rotation=90)
     plt.grid(axis='y', linestyle='--', linewidth=0.5)
     plt.tight_layout()
     plt.show()
@@ -50,27 +50,27 @@ def plot_loadings(variable_names, p, name):
     title2 = "PC2 Loadings" + name
     plt.bar(variable_names, pc2_loadings, color='#791523', alpha=0.8)
     plt.title(title2, fontsize=12)
-    plt.ylabel("Magnitude of Loadings", fontsize=12)
-    plt.xlabel("Variables",fontsize=12)
-    plt.xticks(rotation=90, fontsize=5)
+    plt.xlabel("Magnitude of Loadings", fontsize=12)
+    plt.ylabel("Variables",fontsize=12)
+    plt.xticks(fontsize=5, rotation=90)
     plt.grid(axis='y', linestyle='--', linewidth=0.5)
     plt.tight_layout()
     plt.show()
 
     plot_top_loadings(pc2_loadings, "PC2", variable_names, 30)
 
-    #PLOTTING FOR LOADINGS FOR PC20
-    title2 = "Last PC Loadings" + name
-    plt.bar(variable_names, pclast_loadings, color='#791523', alpha=0.8)
-    plt.title(title2, fontsize=12)
-    plt.ylabel("Magnitude of Loadings", fontsize=12)
-    plt.xlabel("Variables",fontsize=12)
-    plt.xticks(rotation=90, fontsize=5)
+    #PLOTTING FOR LOADINGS FOR PC3
+    title3 = "PC3 Loadings" + name
+    plt.bar(variable_names, pc3_loadings, color='#791523', alpha=0.8)
+    plt.title(title3, fontsize=12)
+    plt.xlabel("Magnitude of Loadings", fontsize=12)
+    plt.ylabel("Variables",fontsize=12)
+    plt.xticks(fontsize=5, rotation=90)
     plt.grid(axis='y', linestyle='--', linewidth=0.5)
     plt.tight_layout()
     plt.show()
 
-    plot_top_loadings(pclast_loadings, "Last PC", variable_names, 30)
+    plot_top_loadings(pc3_loadings, "PC3", variable_names, 30)
 
 
 def plot_scores(t, name):
@@ -83,7 +83,7 @@ def plot_scores(t, name):
     plt.title(titlet, fontsize=12)
     plt.ylabel("T2", fontsize=12)
     plt.xlabel("T1",fontsize=12)
-    plt.xticks(rotation=90, fontsize=5)
+    plt.xticks(fontsize=5)
     plt.grid(axis='y', linestyle='--', linewidth=0.5)
     plt.show()
 
@@ -94,11 +94,11 @@ def plot_top_loadings(p, pc_label, variable_names, num):
     top_p = top_p
 
     title = "Top " + str(num) + " Loadings for " + pc_label 
-    plt.bar(top_varis, top_p, color = '#791523', alpha=0.8)
+    plt.barh(top_varis, top_p, color = '#791523', alpha=0.8)
     plt.title(title, fontsize=12)
-    plt.ylabel("Magnitude of Loadings", fontsize=12)
-    plt.xlabel("Variables", fontsize=12)
-    plt.xticks(rotation=90, fontsize=10)
+    plt.xlabel("Magnitude of Loadings", fontsize=12)
+    plt.ylabel("Variables", fontsize=12)
+    plt.yticks(fontsize=8)
     plt.grid(axis='y', linestyle='--', linewidth=0.5)
     plt.tight_layout()
     plt.show()
@@ -147,10 +147,10 @@ def main():
     t1, p1, r21 = run_nipalspca(df_gi, numComponents, " - NIPALS PCA, 18 PCs")
     save_results(t1, "scores_A18.csv")
 
-    t50, p50, r250 = run_nipalspca(df_5050, numComponents, " - NIPALS PCA, 18 PCs, Undersampled Data (50% Match 1)")
+    t50, p50, r250 = run_nipalspca(df_5050, numComponents, " - NIPALS PCA, 18 PCs, Undersampled (50% Match=1")
     save_results(t50, "scores_A18_5050balance.csv")
 
-    # t40, p40, r240 = run_nipalspca(df_4060, numComponents, "- NIPALS PCA, 18 PCs, Undersampled Data (40% Match 1)")
+    # t40, p40, r240 = run_nipalspca(df_4060, numComponents, "- NIPALS PCA, 18 PCs, Undersampled (40% Match=1)")
     # save_results(t40, "scores_A18_4060balance.csv")
     
 
